@@ -1,14 +1,22 @@
 class Solution:
     def permute(self, nums: List[int]) -> List[List[int]]:
-        def backtrack(start, end):
-            if start == end:
-                result.append(nums[:])
-                return
-            for i in range(start, end):
-                nums[start], nums[i] = nums[i], nums[start]
-                backtrack(start+1, end)
-                nums[start], nums[i] = nums[i], nums[start]
+        res = []
+        visited = set()
 
-        result = []
-        backtrack(0,len(nums))
-        return result
+        def backtrack(path):
+            if len(path) == len(nums):
+                res.append(path.copy())
+                return
+            
+            for n in nums:
+                if n not in visited:
+                    visited.add(n)
+                    path.append(n)
+
+                    backtrack(path)
+
+                    visited.remove(n)
+                    path.pop()
+
+        backtrack([])
+        return res        

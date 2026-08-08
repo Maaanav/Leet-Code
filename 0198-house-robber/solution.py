@@ -1,10 +1,10 @@
 class Solution:
     def rob(self, nums: List[int]) -> int:
-        r1, r2 = 0, 0
+        p2, p1 = 0, 0
         for n in nums:
-            temp = max(n+r1, r2)
-            r1 = r2
-            r2 = temp
+            temp = max(n+p2, p1)
+            p2 = p1
+            p1 = temp
         
         return temp
         

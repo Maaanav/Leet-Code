@@ -1,18 +1,31 @@
 class Solution:
     def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
-        adj = {course: [] for course in range(numCourses)}
-        for course, pre in prerequisites:
-            adj[course].append(pre)
-
-        for course in range(numCourses):
-            stack = [(course, set())]
-            while stack:
-                curr_course, visited = stack.pop()
-                if curr_course in visited:
-                    return False
-                visited.add(curr_course)
-                for pre in adj[curr_course]:
-                    stack.append((pre, visited.copy()))
-            adj[course] = [] 
-        return True
+        adj = [[] for _ in range(numCourses)]
+        for u, v in prerequisites:
+            adj[v].append(u)
         
+        state = [0] * numCourses
+
+        def is_cycle(curr: int) -> bool:
+            if state[curr] == 1:
+                return True
+            if state[curr] == 2:
+                return False
+            
+            state[curr] = 1
+
+            for neighbor in adj[curr]:
+                if is_cycle(neighbor):
+                    return True
+            
+            state[curr] = 2
+            return False
+        
+        for i in range(numCourses):
+            if state[i] == 0:
+                if is_cycle(i):
+                    return False
+        
+        return True
+
+

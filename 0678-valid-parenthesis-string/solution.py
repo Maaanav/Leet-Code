@@ -18,4 +18,4 @@ class Solution:
 
             min_op = max(0, min_op)
 
-        return min_op == 0  
+        return min_op == 0

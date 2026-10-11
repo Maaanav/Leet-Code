@@ -1,22 +1,36 @@
-name: Sync LeetCode Submissions
 
-on:
-  workflow_dispatch:
+      - name: Commit and push changes
+        run: |
+          git config user.name "Maaanav"
+          git config user.email "41898282+Maaanav@users.noreply.github.com"
 
-  schedule:
-    - cron: '30 18 * * *'
+          git add .
 
-jobs:
-  sync:
-    runs-on: ubuntu-latest
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
 
-    permissions:
-      contents: write
+          git commit -m "Sync LeetCode submission"
 
-    steps:
-      - name: Sync LeetCode
-        uses: joshcai/leetcode-sync@v1.7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          leetcode-csrf-token: ${{ secrets.LEETCODE_CSRF_TOKEN }}
-          leetcode-session: ${{ secrets.LEETCODE_SESSION }}
+          # Retry if main changes while we are pushing
+          for attempt in 1 2 3; do
+            git fetch origin main
+
+            if ! git rebase origin/main; then
+              git rebase --abort || true
+              echo "Rebase conflict. Stopping safely."
+              exit 1
+            fi
+
+            if git push origin HEAD:main; then
+              echo "LeetCode solutions pushed successfully."
+              exit 0
+            fi
+
+            echo "Push failed on attempt $attempt."
+            sleep 2
+          done
+
+          echo "Push failed after 3 attempts."
+          exit 1

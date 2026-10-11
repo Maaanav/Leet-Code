@@ -5,13 +5,11 @@ on:
   workflow_dispatch:
 
   schedule:
-    # Runs daily at 12:00 AM IST
     - cron: "30 18 * * *"
 
 permissions:
   contents: write
 
-# Prevent two sync runs from pushing simultaneously
 concurrency:
   group: leetcode-sync-main
   cancel-in-progress: false
@@ -40,8 +38,7 @@ jobs:
         env:
           LEETCODE_SESSION: ${{ secrets.LEETCODE_SESSION }}
           LEETCODE_CSRF_TOKEN: ${{ secrets.LEETCODE_CSRF_TOKEN }}
-        run: |
-          python scripts/leetcode_sync.py
+        run: python scripts/leetcode_sync.py
 
       - name: Commit and push changes
         run: |
@@ -57,11 +54,6 @@ jobs:
 
           git commit -m "Sync LeetCode submission"
 
-          # Fetch the latest changes from GitHub
           git fetch origin main
-
-          # Rebase the new commit onto the latest main
           git rebase origin/main
-
-          # Push without overwriting remote history
           git push origin HEAD:main
